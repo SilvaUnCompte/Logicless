@@ -1,18 +1,28 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PortalTextureSetup : MonoBehaviour
 {
-    public Camera cameraB;
-    public Material cameraMatB;
+    [SerializeField] List<PortalTextureSetupData> portalTextureSetupDataList;
 
     void Start()
     {
-        if (cameraB.targetTexture != null)
+        foreach (PortalTextureSetupData SetupData in portalTextureSetupDataList)
         {
-            cameraB.targetTexture.Release();
+            if (SetupData.camera.targetTexture != null)
+            {
+                SetupData.camera.targetTexture.Release();
+            }
+            SetupData.camera.targetTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.Default, RenderTextureReadWrite.sRGB);
+            SetupData.camera.targetTexture.Create();
+            SetupData.cameraMat.mainTexture = SetupData.camera.targetTexture;
         }
-        cameraB.targetTexture = new RenderTexture(Screen.width, Screen.height, 24, RenderTextureFormat.Default, RenderTextureReadWrite.sRGB);
-        cameraB.targetTexture.Create();
-        cameraMatB.mainTexture = cameraB.targetTexture;
     }
+}
+
+[System.Serializable]
+public class PortalTextureSetupData
+{
+    public Camera camera;
+    public Material cameraMat;
 }
