@@ -2,43 +2,48 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float movementSpeed = 8.0f;
-    public float RotationSpeed = 20.0f;
-    public float jumpForce = 10f;
-    public float gravity = -35f;
+    [Header("Movement Settings")]
+    [SerializeField] private float movementSpeed = 5.5f;
+    [SerializeField] private float sprintMultiplier = 1.5f;
+    [SerializeField] private float crouchMultiplier = 0.35f;
 
-    private CharacterController _characterController;
+    [Header("References")]
+    [SerializeField] private CharacterController _characterController;
+    [SerializeField] private GravitySensor gravitySensor;
+    [SerializeField] private GravityManager gravityManager;
+    [SerializeField] private PlayerCameraManager playerCameraManager;
 
-    private float _rotationY;
+    [Header("Other Settings")]
+    [SerializeField] private float jumpForce = 10f;
+
     private float _verticalVelocity;
+
 
     void Start()
     {
-        _characterController = GetComponent<CharacterController>();
+        if (_characterController == null) Debug.LogError($"[{gameObject.name}] CharacterController is not assigned in the inspector.");
+        if (gravitySensor == null) Debug.LogError($"[{gameObject.name}] GravitySensor is not assigned in the inspector.");
+        if (gravityManager == null) Debug.LogError($"[{gameObject.name}] GravityManager is not assigned in the inspector.");
+        if (playerCameraManager == null) Debug.LogError($"[{gameObject.name}] PlayerCameraManager is not assigned in the inspector.");
     }
 
-    public void HandleMovement(Vector2 moveVector)
+    public void HandleMovement(Vector2 moveVector, bool isSprinting, bool isCrouching) // In Update
     {
-        if (_characterController.isGrounded && _verticalVelocity < 0) _verticalVelocity = -2f;
+        float actualSpeed = movementSpeed * (isSprinting ? sprintMultiplier : 1) * (isCrouching ? crouchMultiplier : 1);
+        Vector3 horizontalMove = (transform.right * moveVector.x + transform.forward * moveVector.y) * actualSpeed;
 
-        Vector3 horizontalMove = (transform.right * moveVector.x + transform.forward * moveVector.y) * movementSpeed;
-        _verticalVelocity += gravity * Time.deltaTime;
+        // Reset vertical velocity if grounded and moving in the direction of gravity
+        if (gravitySensor.IsGrounded() && (_verticalVelocity * GravityManager.gravity > 0)) _verticalVelocity = (GravityManager.gravity > 0) ? 2f : -2f;
+
+        _verticalVelocity += GravityManager.gravity * Time.deltaTime;
         Vector3 finalMove = new Vector3(horizontalMove.x, _verticalVelocity, horizontalMove.z);
 
         _characterController.Move(finalMove * Time.deltaTime);
     }
 
-    public void HandleRotate(Vector2 rotationVector)
-    {
-        _rotationY += rotationVector.x * RotationSpeed * Time.deltaTime;
-        transform.localEulerAngles = new Vector3(0, _rotationY, 0);
-    }
-
     public void HandleJump()
     {
-        if (_characterController.isGrounded)
-        {
-            _verticalVelocity = jumpForce;
-        }
+        if (gravitySensor.IsGrounded()) _verticalVelocity = jumpForce;
+        Debug.Log($"Jumping! Grounded: {gravitySensor.IsGrounded()}, Vertical Velocity: {_verticalVelocity}");
     }
 }
