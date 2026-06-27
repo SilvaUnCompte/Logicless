@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GravitySensor gravitySensor;
     [SerializeField] private GravityManager gravityManager;
     [SerializeField] private PlayerCameraManager playerCameraManager;
+    [SerializeField] private Transform cameraTransform;
 
     [Header("Other Settings")]
     [SerializeField] private float jumpForce = 10f;
@@ -25,25 +26,34 @@ public class PlayerController : MonoBehaviour
         if (gravitySensor == null) Debug.LogError($"[{gameObject.name}] GravitySensor is not assigned in the inspector.");
         if (gravityManager == null) Debug.LogError($"[{gameObject.name}] GravityManager is not assigned in the inspector.");
         if (playerCameraManager == null) Debug.LogError($"[{gameObject.name}] PlayerCameraManager is not assigned in the inspector.");
+        if (cameraTransform == null) Debug.LogError($"[{gameObject.name}] Camera Transform is not assigned in the inspector.");
     }
 
-    public void HandleMovement(Vector2 moveVector, bool isSprinting, bool isCrouching) // In Update
+    public void HandleMovement(Vector2 moveVector, bool isSprinting, bool isCrouching)
     {
         float actualSpeed = movementSpeed * (isSprinting ? sprintMultiplier : 1) * (isCrouching ? crouchMultiplier : 1);
-        Vector3 horizontalMove = (transform.right * moveVector.x + transform.forward * moveVector.y) * actualSpeed;
 
-        // Reset vertical velocity if grounded and moving in the direction of gravity
+        // Based on the camera's orientation
+        Vector3 camForward = cameraTransform.forward;
+        Vector3 camRight = cameraTransform.right;
+        camForward.y = 0;
+        camRight.y = 0;
+        camForward.Normalize();
+        camRight.Normalize();
+
+        Vector3 horizontalMove = (camRight * moveVector.x + camForward * moveVector.y) * actualSpeed;
+
+        // Gravity handling
         if (gravitySensor.IsGrounded() && (_verticalVelocity * GravityManager.gravity > 0)) _verticalVelocity = (GravityManager.gravity > 0) ? 2f : -2f;
-
         _verticalVelocity += GravityManager.gravity * Time.deltaTime;
-        Vector3 finalMove = new Vector3(horizontalMove.x, _verticalVelocity, horizontalMove.z);
 
+        // Apply movement
+        Vector3 finalMove = new Vector3(horizontalMove.x, _verticalVelocity, horizontalMove.z);
         _characterController.Move(finalMove * Time.deltaTime);
     }
 
     public void HandleJump()
     {
-        if (gravitySensor.IsGrounded()) _verticalVelocity = jumpForce;
-        Debug.Log($"Jumping! Grounded: {gravitySensor.IsGrounded()}, Vertical Velocity: {_verticalVelocity}");
+        if (gravitySensor.IsGrounded()) _verticalVelocity = jumpForce * -GravityManager.gravityScaleValue;
     }
 }

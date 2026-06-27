@@ -14,4 +14,6 @@ public class GravityManager : MonoBehaviour
     }
 
     public static float gravity => gravityScale * gravityStrength;
+    public static float gravityStrengthValue => gravityStrength;
+    public static float gravityScaleValue => gravityScale;
 }
