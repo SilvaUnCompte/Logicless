@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class PortalTextureSetup : MonoBehaviour
 {
-    [SerializeField] List<PortalTextureSetupData> portalTextureSetupDataList;
+    [SerializeField] public List<PortalTextureSetupData> portalTextureSetupDataList;
 
     void Start()
     {

@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float movementSpeed = 5.5f;
     [SerializeField] private float sprintMultiplier = 1.5f;
     [SerializeField] private float crouchMultiplier = 0.35f;
+    [SerializeField] private float jumpForce = 10f;
 
     [Header("References")]
     [SerializeField] private CharacterController _characterController;
@@ -13,9 +14,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GravityManager gravityManager;
     [SerializeField] private PlayerCameraManager playerCameraManager;
     [SerializeField] private Transform cameraTransform;
-
-    [Header("Other Settings")]
-    [SerializeField] private float jumpForce = 10f;
+    [SerializeField] private PlayerStat playerStat;
 
     private float _verticalVelocity;
 
@@ -27,11 +26,12 @@ public class PlayerController : MonoBehaviour
         if (gravityManager == null) Debug.LogError($"[{gameObject.name}] GravityManager is not assigned in the inspector.");
         if (playerCameraManager == null) Debug.LogError($"[{gameObject.name}] PlayerCameraManager is not assigned in the inspector.");
         if (cameraTransform == null) Debug.LogError($"[{gameObject.name}] Camera Transform is not assigned in the inspector.");
+        if (playerStat == null) Debug.LogError($"[{gameObject.name}] PlayerStat is not assigned in the inspector.");
     }
-
-    public void HandleMovement(Vector2 moveVector, bool isSprinting, bool isCrouching)
+    
+    public void HandleMovement(Vector2 moveVector)
     {
-        float actualSpeed = movementSpeed * (isSprinting ? sprintMultiplier : 1) * (isCrouching ? crouchMultiplier : 1);
+        float actualSpeed = movementSpeed * (playerStat.isSprinting ? sprintMultiplier : 1) * (playerStat.isCrouching ? crouchMultiplier : 1);
 
         // Based on the camera's orientation
         Vector3 camForward = cameraTransform.forward;
@@ -51,7 +51,7 @@ public class PlayerController : MonoBehaviour
         Vector3 finalMove = new Vector3(horizontalMove.x, _verticalVelocity, horizontalMove.z);
         _characterController.Move(finalMove * Time.deltaTime);
     }
-
+    
     public void HandleJump()
     {
         if (gravitySensor.IsGrounded()) _verticalVelocity = jumpForce * -GravityManager.gravityScaleValue;

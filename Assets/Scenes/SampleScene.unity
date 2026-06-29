@@ -404,6 +404,7 @@ GameObject:
   - component: {fileID: 285204157}
   - component: {fileID: 285204159}
   - component: {fileID: 285204160}
+  - component: {fileID: 285204161}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -457,7 +458,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::InputHandler
   playerController: {fileID: 1635891637}
   playerCamera: {fileID: 330585548}
+  playerStat: {fileID: 1635891642}
   gravityManager: {fileID: 285204160}
+  uiManager: {fileID: 285204161}
 --- !u!114 &285204160
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -471,6 +474,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GravityManager
   playerController: {fileID: 1635891637}
+--- !u!114 &285204161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 285204156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21df4c8395e4fd84996d5be5cb479a04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIManager
 --- !u!1 &286990296
 GameObject:
   m_ObjectHideFlags: 0
@@ -861,6 +876,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCameraManager
   RotationSpeed: 20
+  playerStat: {fileID: 1635891642}
+  playerCamera: {fileID: 330585545}
+  portalTextureSetup: {fileID: 285204157}
+  characterController: {fileID: 1635891641}
+  baseFOV: 60
+  sprintFOV: 70
+  fovSpeed: 5
+  standHeight: 0.5
+  crouchHeight: 0.25
+  crouchTransitionSpeed: 6
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -2420,6 +2445,7 @@ GameObject:
   - component: {fileID: 1635891638}
   - component: {fileID: 1635891641}
   - component: {fileID: 1635891637}
+  - component: {fileID: 1635891642}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -2459,12 +2485,13 @@ MonoBehaviour:
   movementSpeed: 5
   sprintMultiplier: 1.6
   crouchMultiplier: 0.2
+  jumpForce: 10
   _characterController: {fileID: 1635891641}
   gravitySensor: {fileID: 219011201}
   gravityManager: {fileID: 285204160}
   playerCameraManager: {fileID: 330585548}
   cameraTransform: {fileID: 330585546}
-  jumpForce: 10
+  playerStat: {fileID: 1635891642}
 --- !u!136 &1635891638
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2570,6 +2597,20 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1635891642
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1635891635}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 213f75912d1df90438be28dcf50218b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStat
+  isCrouching: 0
+  isSprinting: 0
 --- !u!1 &1635969136
 GameObject:
   m_ObjectHideFlags: 0
